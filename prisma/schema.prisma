@@ -1,0 +1,137 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  MODERATOR
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String?
+  email         String     @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role       @default(USER)
+  status        UserStatus @default(ACTIVE)
+  createdAt     DateTime   @default(now())
+
+  accounts       Account[]
+  sessions       Session[]
+  advertisements Advertisement[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @id
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model Category {
+  id       String  @id @default(cuid())
+  name     String
+  slug     String  @unique
+  parentId String?
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+
+  advertisements Advertisement[]
+
+  @@index([parentId])
+}
+
+model Location {
+  id   String @id @default(cuid())
+  name String
+  slug String @unique
+
+  advertisements Advertisement[]
+}
+
+enum AdStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+}
+
+model Advertisement {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  price         Decimal  @db.Decimal(12, 2)
+  status        AdStatus @default(PENDING)
+  /// Shown only to authenticated users — guests get a sign-in prompt instead.
+  contactPhone  String
+  /// Populated by a moderator when status is set to REJECTED.
+  rejectionNote String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userId     String
+  categoryId String
+  locationId String
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id])
+  location Location @relation(fields: [locationId], references: [id])
+  images   AdImage[]
+
+  // Indexes chosen for the public search query in src/lib/queries.ts
+  @@index([status, createdAt])
+  @@index([categoryId])
+  @@index([locationId])
+  @@index([price])
+  @@index([userId])
+}
+
+model AdImage {
+  id              String  @id @default(cuid())
+  filePath        String
+  isPrimary       Boolean @default(false)
+  advertisementId String
+
+  advertisement Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+
+  @@index([advertisementId])
+}
