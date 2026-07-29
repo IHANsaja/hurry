@@ -11,7 +11,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 space-y-10">
+    <div className="mx-auto max-w-[1600px] px-4 py-8 space-y-10">
       <section className="rounded-xl border bg-background p-8 text-center">
         <h1 className="text-3xl font-semibold tracking-tight">Find what you need, nearby</h1>
         <p className="mt-2 text-muted-foreground">
@@ -58,7 +58,7 @@ export default async function HomePage() {
             No listings yet. Be the first to post one.
           </p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6">
             {recent.items.map((ad) => (
               <AdCard key={ad.id} {...ad} />
             ))}

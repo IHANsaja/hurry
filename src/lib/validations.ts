@@ -3,18 +3,24 @@ import { z } from "zod";
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
+// Shared with the form so the counters and the schema cannot drift apart.
+export const TITLE_MIN = 5;
+export const TITLE_MAX = 50;
+export const DESCRIPTION_MIN = 50;
+export const DESCRIPTION_MAX = 5000;
+
 export const createAdSchema = z.object({
   title: z
     .string()
     .trim()
-    .min(5, "Title should be at least 5 characters")
-    .max(20, "Title should be 20 characters or less"),
+    .min(TITLE_MIN, `Title should be at least ${TITLE_MIN} characters`)
+    .max(TITLE_MAX, `Title should be ${TITLE_MAX} characters or less`),
   description: z
     .string()
     .trim()
-    .min(50, "Description should be at least 50 characters")
-    .max(5000, "Description should be 5000 characters or fewer"),
-  
+    .min(DESCRIPTION_MIN, `Description should be at least ${DESCRIPTION_MIN} characters`)
+    .max(DESCRIPTION_MAX, `Description should be ${DESCRIPTION_MAX} characters or fewer`),
+
   price: z.coerce
     .number({ error: "Price must be a number" })
     .positive("Price must be greater than 0")

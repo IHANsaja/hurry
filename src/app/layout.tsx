@@ -25,8 +25,8 @@ export default function RootLayout({
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <footer className="border-t bg-background">
-          <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-muted-foreground">
-            Hurry — a take-home project.
+          <div className="mx-auto max-w-[1600px] px-4 py-6 text-sm text-muted-foreground justify-center flex items-center gap-2">
+            Hurry! Share your ads with your local community. All rights reserved. &copy; {new Date().getFullYear()} Ihan Hansaja
           </div>
         </footer>
         <Toaster />

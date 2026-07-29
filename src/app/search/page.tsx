@@ -31,7 +31,7 @@ export default async function SearchPage({ searchParams }: Props) {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <div className="mx-auto max-w-[1600px] px-4 py-8">
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <aside>
           <SearchFiltersForm categories={categories} locations={locations} filters={filters} />
@@ -63,7 +63,7 @@ export default async function SearchPage({ searchParams }: Props) {
               </Link>
             </div>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
               {results.items.map((ad) => (
                 <AdCard key={ad.id} {...ad} />
               ))}
