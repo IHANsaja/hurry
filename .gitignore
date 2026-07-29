@@ -52,6 +52,7 @@ next-env.d.ts
 .claude
 # local tooling and study notes, not part of the deliverable
 /.claude
+scripts
 CLAUDE.md
 AGENTS.md
 CODE-EXPLAINED.md
