@@ -1,9 +1,7 @@
 # Hurry
 
-*Classified advertisements MVP*
-
-A classified advertisements platform built for the Junior Fullstack Developer take-home. Guests
-browse and search listings, registered users post ads, and moderators approve or reject them through
+An advertisements platform built for Guests browse and search listings, 
+registered users post ads, and moderators approve or reject them through
 a state-machine-driven queue that notifies the seller by email.
 
 Built on Next.js 16 (App Router, Server Components, Server Actions), Prisma 7 against Neon
@@ -61,63 +59,9 @@ npm run db:seed
 npm run dev
 ```
 
-The seed creates 4 top-level categories with 12 subcategories, 10 locations, 3 demo sellers and 20
-advertisements — 15 `ACTIVE`, 4 `PENDING` and 1 `REJECTED` — so every screen has content on first
-load.
-
-### Google OAuth
-
-1. [Google Cloud Console](https://console.cloud.google.com/) → new project.
-2. **APIs & Services → OAuth consent screen** → External. Add your own address under **Test users**.
-3. **Credentials → Create credentials → OAuth client ID → Web application**.
-4. Authorised JavaScript origin: `http://localhost:3000`
-5. Authorised redirect URI: `http://localhost:3000/api/auth/callback/google`
-
-The redirect path is `/api/auth/callback/{providerId}` and must match exactly, or Google returns
-`redirect_uri_mismatch`.
-
-### AWS SES
-
-Email runs in dry-run mode by default — messages are logged to the server console, so the full
-moderation flow is reviewable with no AWS account at all.
-
-To send for real:
-
-1. **Amazon SES → Verified identities** → verify your sender address.
-2. New accounts sit in the **SES sandbox**, so the *recipient* must be verified too. Verify the
-   address you sign in with.
-3. **IAM** → user with `ses:SendEmail` → create an access key.
-4. Fill in `AWS_*` and `SES_FROM_EMAIL`, then set `EMAIL_DRY_RUN="false"`.
-
-### Signing in as a moderator
-
-Set `MODERATOR_EMAIL` to your Google address **before** running the seed. The seed upserts that user
-with `role: MODERATOR`, and `allowDangerousEmailAccountLinking` binds your Google identity to the
-existing record on first sign-in.
-
-Already seeded and need to promote someone afterwards:
-
 ```bash
 npm run db:studio
 ```
-
-Open the `User` table and change `role` to `MODERATOR`.
-
----
-
-## Routes
-
-| Route | Access | Purpose |
-|---|---|---|
-| `/` | public | Hero search, category tree, recent listings |
-| `/search` | public | Keyword + category + location + price filtering, paginated |
-| `/ads/[id]` | public | Ad detail; contact details gated behind sign-in |
-| `/signin` | public | Google SSO |
-| `/post` | `USER` | Create an ad (lands as `PENDING`) |
-| `/my-ads` | `USER` | Own listings in every state, with rejection notes |
-| `/admin` | `MODERATOR` | Pending queue, approve/reject |
-
----
 
 ## Technical decisions
 
@@ -259,36 +203,11 @@ npm run typecheck && npm run lint && npm run build
 
 All three pass clean. Filter behaviour was checked against the seeded data:
 
-| Query | Results |
-|---|---|
-| no filters | 15 across 2 pages |
-| `?category=vehicles` | 5 (cars 3 + motorbikes 1 + three-wheelers 1) |
-| `?category=cars` | 3 |
-| `?q=toyota` | 1 |
-| `?minPrice=100000&maxPrice=400000` | 5 |
-| `?category=cars&location=colombo` | 1 |
-| `?page=banana` | falls back to page 1 |
-
----
-
 ## Known limitations
 
-- **Image uploads write to `public/uploads/`.** Fine for this MVP and explicitly permitted by the
-  brief, but local disk does not survive a serverless deploy. Production would use S3 presigned
-  URLs, which also keeps the upload off the application server entirely.
-- **Email is best-effort, not queued.** A failed SES call is logged and dropped. A real system would
-  enqueue the job (SQS, or Next's `after()`) so it can be retried.
-- **No automated test suite.** Priority went to a complete working flow within the time available.
-  The two highest-value targets would be the Zod schemas and the state transition rules; the state
-  machine and the load-strategy comparison were verified manually instead
-  (`npm run compare:strategies` is committed and reproducible).
-- **No edit/delete for advertisements.** Sellers can repost after a rejection but cannot amend in
-  place.
+- **Image uploads write to `public/uploads/`.** 
+- **Email is best-effort, not queued.** 
+- **No automated test suite.** 
+- **No edit/delete for advertisements.** 
 - **`npm audit` reports advisories** in `postcss`, `sharp`, `brace-expansion` and `find-my-way`.
-  All are transitive, arriving through Next's, ESLint's and Prisma's own dependency trees, with no
-  fix available that does not break the build. `nodemailer` is the one that mattered — `@auth/core`
-  pins `^8`, which carries an open advisory, so an npm `override` forces the patched 9.x line for
-  every consumer.
-- **`pg` prints an SSL deprecation warning** about `sslmode=require` on startup. Neon's standard
-  connection string triggers it; the current behaviour is the stricter `verify-full`, so it is
-  informational.
+- **`pg` prints an SSL deprecation warning** about `sslmode=require` on startup. 

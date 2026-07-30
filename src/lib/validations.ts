@@ -60,11 +60,6 @@ export const moderateAdSchema = z
     },
   );
 
-/**
- * A GET form submits every field, so untouched inputs arrive as "".
- * Without this, `z.coerce.number()` turns "" into 0 (because Number("") === 0)
- * and an empty max-price filter becomes `price <= 0`, matching nothing.
- */
 const blankToUndefined = (value: unknown) =>
   value === "" || value === null ? undefined : value;
 
