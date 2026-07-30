@@ -60,13 +60,29 @@ export const moderateAdSchema = z
     },
   );
 
+/**
+ * A GET form submits every field, so untouched inputs arrive as "".
+ * Without this, `z.coerce.number()` turns "" into 0 (because Number("") === 0)
+ * and an empty max-price filter becomes `price <= 0`, matching nothing.
+ */
+const blankToUndefined = (value: unknown) =>
+  value === "" || value === null ? undefined : value;
+
+const optionalText = (max: number) =>
+  z.preprocess(blankToUndefined, z.string().trim().max(max).optional());
+
+const optionalPrice = z.preprocess(
+  blankToUndefined,
+  z.coerce.number().nonnegative().optional(),
+);
+
 export const searchParamsSchema = z.object({
-  q: z.string().trim().max(120).optional().catch(undefined),
-  category: z.string().trim().optional().catch(undefined),
-  location: z.string().trim().optional().catch(undefined),
-  minPrice: z.coerce.number().nonnegative().optional().catch(undefined),
-  maxPrice: z.coerce.number().nonnegative().optional().catch(undefined),
-  page: z.coerce.number().int().min(1).default(1).catch(1),
+  q: optionalText(120).catch(undefined),
+  category: optionalText(80).catch(undefined),
+  location: optionalText(80).catch(undefined),
+  minPrice: optionalPrice.catch(undefined),
+  maxPrice: optionalPrice.catch(undefined),
+  page: z.preprocess(blankToUndefined, z.coerce.number().int().min(1).default(1)).catch(1),
 });
 
 export type SearchFilters = z.infer<typeof searchParamsSchema>;
