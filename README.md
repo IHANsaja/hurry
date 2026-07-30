@@ -14,12 +14,12 @@ PostgreSQL, Auth.js v5 with Google SSO, and AWS SES for transactional email.
 | Concern | Choice | Version |
 |---|---|---|
 | Framework | Next.js (App Router) | 16.2.12 |
-| UI | React, TailwindCSS, shadcn/ui | 19.2.8 / 4.x / 4.15 |
+| UI | React, TailwindCSS, shadcn/ui | 19.2.8 / 4.1 / 4.15 |
 | ORM | Prisma + `@prisma/adapter-pg` | 7.9.0 |
 | Database | Neon PostgreSQL | — |
 | Auth | Auth.js (`next-auth@beta`) + `@auth/prisma-adapter` | 5.0.0-beta.32 |
 | Validation | Zod | 4.4.3 |
-| Email | Nodemailer + `@aws-sdk/client-sesv2` | 9.0.3 / 3.x |
+| Email | Nodemailer + `@aws-sdk/client-sesv2` | 9.0.3 / 3.1095.0 |
 
 Requires Node 20.19+, 22.12+, or 24+ (Prisma 7's floor).
 
